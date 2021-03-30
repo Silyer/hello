@@ -1,1 +1,10 @@
 hello
+git clone git@github.com:--- . 지정 저장소를 현재 디렉토리로(.) 복제
+git diff 차이점 출력
+git add ???.txt --를 커밋.
+git commit -m "blah" blah라는내용으로 커밋.
+git log 히스토리 출력
+컴터 내 저장소와 깃허브는 서로 버전이 다르면 동기화를 시킴.
+-> git push로 깃허브에 업로드.
+commits++
+git status 현재 상태, 수정 내역
