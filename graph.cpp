@@ -24,7 +24,7 @@ void dfs(int x) {
 
 //인접 행렬을 이용한 구현  O(v^2)
 queue<int> q;
-check[1] = true; q.push(1);  //큐에 넣을 때 방문함을 알림, 시작점
+q.push(1); check[1] = true;   //큐에 넣을 때 방문함을 알림, 시작점
 while(!q.empty()) {
   int x = q.front(); q.pop();
   for(int i = 1; i <= n; i++) {
