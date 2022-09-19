@@ -4,26 +4,26 @@
 #include <time.h>
 #define NUM 10
 
-int queue[NUM];
-int front = 0, rear = 0;
+int queue[10][NUM];
+int front[10], rear[10];
 
-bool IsFull() {
-	if ((rear + 1) % NUM == front) return true;
+bool IsFull(int n) {
+	if ((rear[n] + 1) % NUM == front[n]) return true;
 	return false;
 }
-bool IsEmpty() {
-	if (front == rear) return true;
+bool IsEmpty(int n) {
+	if (front[n] == rear[n]) return true;
 	return false;
 }
-int Dequeue() {
-	if (IsEmpty()) return -1;
-	front = (front + 1) % NUM;
-	return queue[front];
+int Dequeue(int n) {
+	if (IsEmpty(n)) return -1;
+	front[n] = (front[n] + 1) % NUM;
+	return queue[n][front[n]];
 }
-bool Enqueue(int a) {
-	if (IsFull()) return false;
-	rear = (rear + 1) % NUM;
-	queue[rear] = a;
+bool Enqueue(int n, int a) {
+	if (IsFull(n)) return false;
+	rear[n] = (rear[n] + 1) % NUM;
+	queue[n][rear[n]] = a;
 	return true;
 }
 
@@ -56,10 +56,10 @@ void SelectionSort(int* a, int n) {
 		min = i;
 		for (int j = i + 1; j < n; j++) {
 			if (a[j] < a[min]) min = j;
-			temp = a[min];
-			a[min] = a[i];
-			a[i] = temp;
 		}
+		temp = a[min];
+		a[min] = a[i];
+		a[i] = temp;
 	}
 
 	for (int k = 0; k < n; k++)
@@ -129,10 +129,10 @@ void MergeSort(int* a, int l, int r) {
 }
 
 void QuickSort(int* a, int l, int r) {
-	int temp, p = (l + r) / 2, ll = l, rr = r;
+	int temp, p = a[(l + r) / 2], ll = l, rr = r;
 	while (ll <= rr) {
-		while (a[ll] < a[p]) ll++;
-		while (a[rr] > a[p]) rr--;
+		while (a[ll] < p) ll++;
+		while (a[rr] > p) rr--;
 
 		if (ll <= rr) {
 			temp = a[ll];
@@ -149,27 +149,27 @@ void QuickSort(int* a, int l, int r) {
 }
 
 void RadixSort(int* a, int n) {
-	int max = a[0], d = 0, t = 1;
-	for (int i = 1; i < n; i++)
-		if (max < a[i]) max = a[i];
-	for (int i = max; i > 0; i /= 10) d++;
-
-	for (int i = 0; i < d; i++) {
+	int max = 100;
+	for (int i = 1; i <= max; i *= 10) {
+		for (int j = 0; j < n; j++) {
+			int d = 0;
+			if (a[j] >= i) {
+				d = (a[j] / i) % (i * 10);
+			}
+			Enqueue(d, a[j]);
+		}
+		int t = 0;
 		for (int j = 0; j < 10; j++) {
-			for (int k = 0; k < n; k++) {
-				if ((a[k] / t) % 10 == j)
-					Enqueue(a[k]);
+			while (!IsEmpty(j)) {
+				a[t++] = Dequeue(j);
 			}
 		}
-		t *= 10;
-		for (int i = front; i != rear; i++)
-			a[i] = Dequeue();
-		front = rear = 0;
 	}
-	
-	
-	
+	for (int k = 0; k < n; k++)
+		printf("%d ", a[k]);
+	printf("\n\n");
 }
+
 int main() {
 	int arr[NUM];
 
@@ -200,10 +200,7 @@ int main() {
 	printf("\n\n");
 
 	setArray(arr);
-	RadixSort(arr, NUM);
+	RadixSort(arr,NUM);
 
-	for (int k = 0; k < NUM; k++)
-		printf("%d ", arr[k]);
-	printf("\n\n");
 	return 0;
 }
