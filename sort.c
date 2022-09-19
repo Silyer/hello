@@ -152,10 +152,7 @@ void RadixSort(int* a, int n) {
 	int max = 100;
 	for (int i = 1; i <= max; i *= 10) {
 		for (int j = 0; j < n; j++) {
-			int d = 0;
-			if (a[j] >= i) {
-				d = (a[j] / i) % (i * 10);
-			}
+			int d = (a[j] / i) % (i * 10);
 			Enqueue(d, a[j]);
 		}
 		int t = 0;
