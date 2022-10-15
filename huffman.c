@@ -1,16 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define MAX_SIZE 5
+#include <ctype.h>
+#define MAX_SIZE 100
 
 typedef struct element {
 	char ch;
-	int freq;
+	int size;
 } element;
 
 typedef struct Htree {
-	element node;
-	struct Htree *left;
-	struct Htree *right;
+	element treeNode;
+	struct Htree* left;
+	struct Htree* right;
 } Htree;
 
 typedef struct Heap {
@@ -18,44 +19,34 @@ typedef struct Heap {
 	int size;
 } Heap;
 
-void init_ele(element *n) {
-	n->ch = '\0';
-	n->freq = 0;
-}
-
-void init_tree(Htree *tree) {
-	tree->node.ch = '\0';
-	tree->node.freq = 0;
-}
-
-void init_heap(Heap *h) {
-	for (int i = 0; i < MAX_SIZE; i++) {
+void init_Heap(Heap *h) {
+	for(int i = 0; i < MAX_SIZE; i++) {
 		h->HeapNode[i].ch = '\0';
-		h->HeapNode[i].freq = 0;
+		h->HeapNode[i].size = 0;
 	}
 	h->size = 0;
 }
 
-void upheap(Heap *h, element item) {
+void insert_Heap(Heap *h, element e) {
 	int size = ++(h->size);
-	h->HeapNode[size] = item;
-	while (size != 1 && h->HeapNode[size].freq < h->HeapNode[size / 2].freq) {
-		element t = h->HeapNode[size / 2];
-		h->HeapNode[size / 2] = h->HeapNode[size];
-		h->HeapNode[size] = t;
+	int temp = size;
+	element t;
+	h->HeapNode[size] = e;
+	while(size != 1 && h->HeapNode[size].size < h->HeapNode[size / 2].size) {
+		t = h->HeapNode[size];
+		h->HeapNode[size] = h->HeapNode[size / 2];
+		h->HeapNode[size / 2] = t;
 		size /= 2;
 	}
 }
 
-element downheap(Heap* h) {
-	element root = h->HeapNode[1];
-	element end = h->HeapNode[h->size];
-	int size = --(h->size);
-	int parent = 1, child = 2;
-	h->HeapNode[1] = end;
-	while (child <= size) {
-		if (h->HeapNode[child].freq > h->HeapNode[child + 1].freq) child++;
-		if (h->HeapNode[parent].freq > h->HeapNode[child].freq) {
+element delete_Heap(Heap *h) {
+	element min = h->HeapNode[1], temp = h->HeapNode[h->size];
+	int size = --(h->size), parent = 1, child = 2;
+	h->HeapNode[1] = temp;
+	while(child <= size)  {
+		if(h->HeapNode[child].size > h->HeapNode[child + 1].size) child++;
+		if(h->HeapNode[parent].size > h->HeapNode[child].size) {	
 			element t = h->HeapNode[child];
 			h->HeapNode[child] = h->HeapNode[parent];
 			h->HeapNode[parent] = t;
@@ -63,65 +54,41 @@ element downheap(Heap* h) {
 		parent = child;
 		child *= 2;
 	}
-	return root;
+	return min;
 }
-
-Htree makeNode(element left, element right) {
-	Htree tree;
-	init_tree(&tree);
-	tree.node.ch = '\0';
-	tree.node.freq = left.freq + right.freq;
-	tree.left->node = left;
-	tree.right->node = right;
-	return tree;
-}
-
-element makeElement(element a, element b) {
-	element n;
-	n.ch = '\0';
-	n.freq = a.freq + b.freq;
-	return n;
-}
-
-Htree HuffmanTree(Heap *h) {
-	Htree tree;
-	element a, b;
-	init_ele(&a);
-	init_ele(&b);
-	for (int i = 0; i < MAX_SIZE; i++) {
-		tree = makeNode(a, b);
+void getFreq(char *a, int *f) {
+	for(int i = 0; i < MAX_SIZE; i++){
+		if(a[i] >= 'A' && a[i] <= 'Z') tolower(a[i]);
+		for(int j = 0; j < 26; j++) {
+			if(a[i] == 'a' + j) f[j]++;
+		}
 	}
-	while (h->size >= 2) {
-		element a, b, n;
-		a = downheap(&h);
-		b = downheap(&h);
-		n = makeElement(a, b);
-		tree = makeNode(a, b);
-		upheap(&h, n);
-		printf("가중치 %d인 %c와 가중치 %d인 %c가 결합\n", a.freq, a.ch, b.freq, b.ch);
-	}
-	return tree;
 }
 
 int main() {
-	element node;
 	Heap h;
-	Htree huff;
-	char a;
-	int n;
-	init_heap(&h);
-	for (int i = 0; i < MAX_SIZE; i++) {
-		printf("%d 번째 문자 : ", i + 1);
-		if (i != 0) getchar();
-		scanf_s("%c", &a);	
-		getchar();
-		printf("빈도 : ");
-		scanf_s("%d", &n);
+	char a[MAX_SIZE];
+	int freq[26];
+	init_Heap(&h);
 
-		node.ch = a;
-		node.freq = n;
-		printf("입력받은 문자 : %c, 입력받은 빈도 : %d\n", node.ch, n);
-		upheap(&h, node);
+	for(int i = 0; i < 26; i++) freq[i] = 0;
+	for(int i = 0; i < MAX_SIZE; i++) a[i] = '\0';
+	scanf("%s", a);
+	getFreq(a, freq);
+
+	for(int i = 0; i < 26; i++) {
+		if(freq[i] != 0) {
+			element e;
+			e.ch = 'a' + i;
+			e.size = freq[i];
+			insert_Heap(&h, e);
+		}
 	}
-	huff = HuffmanTree(&h);
+	int size = h.size, n = 0;
+	while(size) {
+		element e = delete_Heap(&h);
+		printf("%d번째로 작은 가중치가 %d인 %c\n", ++n, e.size, e.ch);
+		size--;
+	}
+	return 0;
 }
