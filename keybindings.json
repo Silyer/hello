@@ -1,0 +1,22 @@
+// 키 바인딩을 이 파일에 넣어서 기본값 재정의
+[
+    // build
+    {
+        "key": "ctrl+b",
+        "command": "workbench.action.tasks.build", 
+    },
+    // run
+    {
+        "key": "ctrl+r",
+        "command": "workbench.action.tasks.test", 
+    },
+    // replace keys for overlapping tasks
+    {
+        "key": "ctrl+shift+b",
+        "command": "workbench.action.toggleSidebarVisibility"
+    },
+    {
+        "key": "ctrl+shift+r",
+        "command": "workbench.action.openRecent"
+    },
+]
